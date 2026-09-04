@@ -1,0 +1,58 @@
+package com.trelloclone.trello.auth;
+
+import java.util.Optional;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.trelloclone.trello.user.User;
+import com.trelloclone.trello.user.UserRepository;
+
+@Service
+public class AuthService {
+
+    private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public void signup(SignupRequest request) {
+
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already registered");
+        }
+
+        User user = new User();
+
+        String hashedPassword = passwordEncoder.encode(request.getPassword());
+
+        user.setEmail(request.getEmail());
+        user.setPassword(hashedPassword);
+        user.setUserName(request.getUserName());
+
+        userRepository.save(user);
+    }
+
+    public void signin(SigninRequest request) {
+        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("Invalid credentials");
+        }
+
+        User user = optionalUser.get();
+
+        boolean isMatching = passwordEncoder.matches(request.getPassword(), user.getPassword());
+
+        if (!isMatching) {
+            throw new RuntimeException("Invalid credentials");
+        }
+
+        String token = "We will generate token here";
+
+    }
+}
