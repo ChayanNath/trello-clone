@@ -1,12 +1,14 @@
 package com.trelloclone.trello.common;
 
-public class ApiResponse {
+public class ApiResponse<T> {
     private String status;
     private String message;
+    private T data;
 
-    public ApiResponse(String status, String message) {
+    public ApiResponse(String status, String message, T data) {
         this.status = status;
         this.message = message;
+        this.data = data;
     }
 
     public String getStatus() {
@@ -15,5 +17,9 @@ public class ApiResponse {
 
     public String getMessage() {
         return message;
+    }
+
+    public T getData() {
+        return data;
     }
 }
