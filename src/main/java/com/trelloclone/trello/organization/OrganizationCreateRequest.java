@@ -2,7 +2,7 @@ package com.trelloclone.trello.organization;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class OrganizationRequest {
+public class OrganizationCreateRequest {
 
     @NotBlank
     private String name;
