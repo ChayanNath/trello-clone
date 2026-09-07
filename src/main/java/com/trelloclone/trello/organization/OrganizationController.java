@@ -31,8 +31,9 @@ public class OrganizationController {
 
     @PostMapping("")
     public ResponseEntity<ApiResponse<GetOrganizationResponse>> create(
-            @Valid @RequestBody OrganizationCreateRequest request) {
-        GetOrganizationResponse organization = organizationService.createOrganization(request);
+            @AuthenticationPrincipal Jwt jwt, @Valid @RequestBody OrganizationCreateRequest request) {
+        GetOrganizationResponse organization = organizationService.createOrganization(request,
+                UUID.fromString(jwt.getSubject()));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>(
                         "success",
