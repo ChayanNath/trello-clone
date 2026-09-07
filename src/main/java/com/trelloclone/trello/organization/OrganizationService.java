@@ -46,25 +46,19 @@ public class OrganizationService {
     }
 
     public void deleteOrganization(UUID id) {
-        Optional<Organization> organization = organizationRepository.findById(id);
+        Organization org = organizationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Organization not found"));
 
-        if (organization.isEmpty()) {
-            throw new RuntimeException("Organization not found");
-        }
-
-        organizationRepository.deleteById(id);
+        organizationRepository.delete(org);
     }
 
     public GetOrganizationResponse getOrganization(UUID id) {
-        Optional<Organization> organization = organizationRepository.findById(id);
 
-        if (organization.isEmpty()) {
-            throw new RuntimeException("Organization not found");
-        }
+        Organization organization = organizationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Organization not found"));
 
-        Organization org = organization.get();
-
-        return new GetOrganizationResponse(org.getUuid(), org.getName(), org.getDescription());
+        return new GetOrganizationResponse(organization.getUuid(), organization.getName(),
+                organization.getDescription());
     }
 
 }

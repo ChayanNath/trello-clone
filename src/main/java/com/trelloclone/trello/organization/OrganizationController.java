@@ -23,7 +23,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/v1/organization")
 public class OrganizationController {
 
-    private OrganizationService organizationService;
+    private final OrganizationService organizationService;
 
     public OrganizationController(OrganizationService organizationService) {
         this.organizationService = organizationService;
@@ -62,14 +62,14 @@ public class OrganizationController {
                         null));
     }
 
-    @GetMapping("")
+    @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<GetOrganizationResponse>> get(@PathVariable UUID id) {
 
         GetOrganizationResponse organizationResponse = organizationService.getOrganization(id);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse<>(
                         "success",
-                        "Organization updated successfully",
+                        "Fetched organization",
                         organizationResponse));
     }
 }
