@@ -30,25 +30,26 @@ public class OrganizationController {
     }
 
     @PostMapping("")
-    public ResponseEntity<ApiResponse<Void>> create(@Valid @RequestBody OrganizationCreateRequest request) {
-        organizationService.createOrganization(request);
+    public ResponseEntity<ApiResponse<GetOrganizationResponse>> create(
+            @Valid @RequestBody OrganizationCreateRequest request) {
+        GetOrganizationResponse organization = organizationService.createOrganization(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>(
                         "success",
                         "Organization created successfully",
-                        null));
+                        organization));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> update(@PathVariable UUID id,
+    public ResponseEntity<ApiResponse<GetOrganizationResponse>> update(@PathVariable UUID id,
             @Valid @RequestBody OrganizationUpdateRequest request) {
 
-        organizationService.updateOrganization(id, request);
+        GetOrganizationResponse organization = organizationService.updateOrganization(id, request);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse<>(
                         "success",
                         "Organization updated successfully",
-                        null));
+                        organization));
     }
 
     @DeleteMapping("/{id}")

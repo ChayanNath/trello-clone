@@ -15,17 +15,20 @@ public class OrganizationService {
         this.organizationRepository = organizationRepository;
     }
 
-    public void createOrganization(OrganizationCreateRequest request) {
+    public GetOrganizationResponse createOrganization(OrganizationCreateRequest request) {
 
         Organization organization = new Organization();
         organization.setName(request.getName());
         organization.setDescription(request.getDescription());
 
         organizationRepository.save(organization);
+
+        return new GetOrganizationResponse(organization.getUuid(), organization.getName(),
+                organization.getDescription());
     }
 
     @Transactional
-    public void updateOrganization(UUID id, OrganizationUpdateRequest request) {
+    public GetOrganizationResponse updateOrganization(UUID id, OrganizationUpdateRequest request) {
 
         Optional<Organization> organization = organizationRepository.findById(id);
 
@@ -42,6 +45,9 @@ public class OrganizationService {
         if (request.getDescription() != null) {
             org.setDescription(request.getDescription());
         }
+
+        return new GetOrganizationResponse(org.getUuid(), org.getName(),
+                org.getDescription());
 
     }
 
