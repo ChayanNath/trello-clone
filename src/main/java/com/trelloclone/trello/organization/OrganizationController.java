@@ -23,55 +23,63 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/v1/organization")
 public class OrganizationController {
 
-    private final OrganizationService organizationService;
+        private final OrganizationService organizationService;
 
-    public OrganizationController(OrganizationService organizationService) {
-        this.organizationService = organizationService;
-    }
+        public OrganizationController(OrganizationService organizationService) {
+                this.organizationService = organizationService;
+        }
 
-    @PostMapping("")
-    public ResponseEntity<ApiResponse<GetOrganizationResponse>> create(
-            @AuthenticationPrincipal Jwt jwt, @Valid @RequestBody OrganizationCreateRequest request) {
-        GetOrganizationResponse organization = organizationService.createOrganization(request,
-                UUID.fromString(jwt.getSubject()));
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(
-                        "success",
-                        "Organization created successfully",
-                        organization));
-    }
+        @PostMapping
+        public ResponseEntity<ApiResponse<GetOrganizationResponse>> create(
+                        @AuthenticationPrincipal Jwt jwt, @Valid @RequestBody OrganizationCreateRequest request) {
+                GetOrganizationResponse organization = organizationService.createOrganization(request,
+                                UUID.fromString(jwt.getSubject()));
+                return ResponseEntity.status(HttpStatus.CREATED)
+                                .body(new ApiResponse<>(
+                                                "success",
+                                                "Organization created successfully",
+                                                organization));
+        }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<GetOrganizationResponse>> update(@PathVariable UUID id,
-            @Valid @RequestBody OrganizationUpdateRequest request) {
+        @PatchMapping("/{organizationId}")
+        public ResponseEntity<ApiResponse<GetOrganizationResponse>> update(@AuthenticationPrincipal Jwt jwt,
+                        @PathVariable UUID organizationId,
+                        @Valid @RequestBody OrganizationUpdateRequest request) {
 
-        GetOrganizationResponse organization = organizationService.updateOrganization(id, request);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse<>(
-                        "success",
-                        "Organization updated successfully",
-                        organization));
-    }
+                UUID userId = UUID.fromString(jwt.getSubject());
+                GetOrganizationResponse organization = organizationService.updateOrganization(organizationId, userId,
+                                request);
+                return ResponseEntity.status(HttpStatus.OK)
+                                .body(new ApiResponse<>(
+                                                "success",
+                                                "Organization updated successfully",
+                                                organization));
+        }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
+        @DeleteMapping("/{organizationId}")
+        public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID organizationId,
+                        @AuthenticationPrincipal Jwt jwt) {
 
-        organizationService.deleteOrganization(id);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse<>(
-                        "success",
-                        "Organization deleted successfully",
-                        null));
-    }
+                UUID userId = UUID.fromString(jwt.getSubject());
+                organizationService.deleteOrganization(organizationId, userId);
+                return ResponseEntity.status(HttpStatus.OK)
+                                .body(new ApiResponse<>(
+                                                "success",
+                                                "Organization deleted successfully",
+                                                null));
+        }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<GetOrganizationResponse>> get(@PathVariable UUID id) {
+        @GetMapping("/{organizationId}")
+        public ResponseEntity<ApiResponse<GetOrganizationResponse>> get(@PathVariable UUID organizationId,
+                        @AuthenticationPrincipal Jwt jwt) {
 
-        GetOrganizationResponse organizationResponse = organizationService.getOrganization(id);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse<>(
-                        "success",
-                        "Fetched organization",
-                        organizationResponse));
-    }
+                UUID userId = UUID.fromString(jwt.getSubject());
+                GetOrganizationResponse organizationResponse = organizationService.getOrganization(organizationId,
+                                userId);
+                return ResponseEntity.status(HttpStatus.OK)
+                                .body(new ApiResponse<>(
+                                                "success",
+                                                "Fetched organization",
+                                                organizationResponse));
+        }
 }

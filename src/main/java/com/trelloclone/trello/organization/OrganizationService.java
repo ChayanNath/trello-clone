@@ -49,12 +49,20 @@ public class OrganizationService {
     }
 
     @Transactional
-    public GetOrganizationResponse updateOrganization(UUID id, OrganizationUpdateRequest request) {
+    public GetOrganizationResponse updateOrganization(UUID organizationId, UUID userId,
+            OrganizationUpdateRequest request) {
 
-        Optional<Organization> organization = organizationRepository.findById(id);
+        Optional<Organization> organization = organizationRepository.findById(organizationId);
 
         if (organization.isEmpty()) {
             throw new RuntimeException("Organization not found");
+        }
+
+        Membership membership = membershipRepository.findUserByIdAndOrganizationId(userId, organizationId)
+                .orElseThrow(() -> new RuntimeException("Not a member"));
+
+        if (membership.getRole() != MembershipRole.ADMIN) {
+            throw new RuntimeException("Not authorized");
         }
 
         Organization org = organization.get();
@@ -72,17 +80,27 @@ public class OrganizationService {
 
     }
 
-    public void deleteOrganization(UUID id) {
-        Organization org = organizationRepository.findById(id)
+    public void deleteOrganization(UUID organizationId, UUID userId) {
+
+        Membership membership = membershipRepository.findUserByIdAndOrganizationId(userId, organizationId)
+                .orElseThrow(() -> new RuntimeException("Not a member"));
+
+        if (membership.getRole() != MembershipRole.ADMIN) {
+            throw new RuntimeException("Not authorized");
+        }
+        Organization org = organizationRepository.findById(organizationId)
                 .orElseThrow(() -> new RuntimeException("Organization not found"));
 
         organizationRepository.delete(org);
     }
 
-    public GetOrganizationResponse getOrganization(UUID id) {
+    public GetOrganizationResponse getOrganization(UUID organizationId, UUID userId) {
 
-        Organization organization = organizationRepository.findById(id)
+        Organization organization = organizationRepository.findById(organizationId)
                 .orElseThrow(() -> new RuntimeException("Organization not found"));
+
+        membershipRepository.findUserByIdAndOrganizationId(userId, organizationId)
+                .orElseThrow(() -> new RuntimeException("Not a member"));
 
         return new GetOrganizationResponse(organization.getUuid(), organization.getName(),
                 organization.getDescription());
