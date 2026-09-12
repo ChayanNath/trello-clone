@@ -6,6 +6,8 @@ import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.trelloclone.trello.common.exception.DuplicateEmailException;
+import com.trelloclone.trello.common.exception.InvalidCredentialsException;
 import com.trelloclone.trello.security.JwtService;
 import com.trelloclone.trello.user.User;
 import com.trelloclone.trello.user.UserRepository;
@@ -27,7 +29,7 @@ public class AuthService {
     public void signup(SignupRequest request) {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already registered");
+            throw new DuplicateEmailException("Email already registered");
         }
 
         User user = new User();
@@ -45,7 +47,7 @@ public class AuthService {
         Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
 
         if (optionalUser.isEmpty()) {
-            throw new RuntimeException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
         User user = optionalUser.get();
@@ -53,7 +55,7 @@ public class AuthService {
         boolean isMatching = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
         if (!isMatching) {
-            throw new RuntimeException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
         return jwtService.generateToken(user);
