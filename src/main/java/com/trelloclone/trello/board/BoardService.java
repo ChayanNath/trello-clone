@@ -39,4 +39,16 @@ public class BoardService {
 
         return new GetBoardResponse(board.getUuid(), board.getTitle(), organization.getUuid());
     }
+
+    public GetBoardResponse getBoard(UUID organizationId, UUID boardId, UUID userId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new RuntimeException("Board not found"));
+
+        if (!board.getOrganization().getUuid().equals(organizationId)) {
+            throw new RuntimeException("Board does not belong to organization");
+        }
+
+        membershipRepository.findByUserIdAndOrganizationId(userId, organizationId)
+                .orElseThrow(() -> new RuntimeException("Not a member"));
+        return new GetBoardResponse(board.getUuid(), board.getTitle(), organizationId);
+    }
 }

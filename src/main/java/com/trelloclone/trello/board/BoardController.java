@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,5 +38,16 @@ public class BoardController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>("success", "Board created Successfully", board));
+    }
+
+    @GetMapping("/{boardId}")
+    public ResponseEntity<ApiResponse<GetBoardResponse>> getBoard(@PathVariable UUID organizationId,
+            @PathVariable UUID boardId, @AuthenticationPrincipal Jwt jwt) {
+
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+        GetBoardResponse board = boardService.getBoard(organizationId, boardId, userId);
+
+        return ResponseEntity.ok().body(new ApiResponse<>("success", "board fetched successfully", board));
     }
 }
