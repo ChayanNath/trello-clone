@@ -36,6 +36,6 @@ public class BoardController {
         GetBoardResponse board = boardService.createBoard(userId, organizationId, createRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>("success", "Board Created Successfully", board));
+                .body(new ApiResponse<>("success", "Board created Successfully", board));
     }
 }

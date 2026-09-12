@@ -25,7 +25,7 @@ public class BoardService {
     }
 
     public GetBoardResponse createBoard(UUID userId, UUID organizationId, BoardCreateRequest request) {
-        membershipRepository.findUserByIdAndOrganizationId(userId, organizationId)
+        membershipRepository.findByUserIdAndOrganizationId(userId, organizationId)
                 .orElseThrow(() -> new RuntimeException("Not a member"));
 
         Organization organization = organizationRepository.findById(organizationId)
