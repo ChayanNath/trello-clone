@@ -21,4 +21,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ApiResponse<>("error", exception.getMessage(), null));
     }
+
+    @ExceptionHandler(BoardNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBoardNotFound(BoardNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse<>("error", exception.getMessage(), null));
+    }
 }

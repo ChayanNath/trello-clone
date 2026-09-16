@@ -22,7 +22,7 @@ public class GetBoardResponse {
         return title;
     }
 
-    public UUID organizationId() {
+    public UUID getOrganizationId() {
         return organizationId;
     }
 }

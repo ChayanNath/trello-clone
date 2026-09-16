@@ -5,8 +5,12 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.trelloclone.trello.board.dto.BoardCreateRequest;
+import com.trelloclone.trello.board.dto.BoardUpdateRequest;
 import com.trelloclone.trello.board.dto.GetBoardResponse;
+import com.trelloclone.trello.common.exception.BoardNotFoundException;
+import com.trelloclone.trello.membership.Membership;
 import com.trelloclone.trello.membership.MembershipRepository;
+import com.trelloclone.trello.membership.MembershipRole;
 import com.trelloclone.trello.organization.Organization;
 import com.trelloclone.trello.organization.OrganizationRepository;
 
@@ -41,7 +45,8 @@ public class BoardService {
     }
 
     public GetBoardResponse getBoard(UUID organizationId, UUID boardId, UUID userId) {
-        Board board = boardRepository.findById(boardId).orElseThrow(() -> new RuntimeException("Board not found"));
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new BoardNotFoundException("Board not found"));
 
         if (!board.getOrganization().getUuid().equals(organizationId)) {
             throw new RuntimeException("Board does not belong to organization");
@@ -50,5 +55,45 @@ public class BoardService {
         membershipRepository.findByUserIdAndOrganizationId(userId, organizationId)
                 .orElseThrow(() -> new RuntimeException("Not a member"));
         return new GetBoardResponse(board.getUuid(), board.getTitle(), organizationId);
+    }
+
+    public GetBoardResponse updateBoard(UUID organizationId, UUID boardId, UUID userId, BoardUpdateRequest request) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow((() -> new BoardNotFoundException("Board not found")));
+
+        if (!board.getOrganization().getUuid().equals(organizationId)) {
+            throw new RuntimeException("Board does not belong to organization");
+        }
+
+        Membership membership = membershipRepository.findByUserIdAndOrganizationId(userId, organizationId)
+                .orElseThrow(() -> new RuntimeException("Not a member"));
+
+        if (membership.getRole() != MembershipRole.ADMIN) {
+            throw new RuntimeException("Not authorized");
+        }
+
+        board.setTitle(request.getTitle());
+
+        boardRepository.save(board);
+
+        return new GetBoardResponse(board.getUuid(), board.getTitle(), organizationId);
+    }
+
+    public void deleteBoard(UUID organizationId, UUID boardId, UUID userId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow((() -> new BoardNotFoundException("Board not found")));
+
+        if (!board.getOrganization().getUuid().equals(organizationId)) {
+            throw new RuntimeException("Board does not belong to organization");
+        }
+
+        Membership membership = membershipRepository.findByUserIdAndOrganizationId(userId, organizationId)
+                .orElseThrow(() -> new RuntimeException("Not a member"));
+
+        if (membership.getRole() != MembershipRole.ADMIN) {
+            throw new RuntimeException("Not authorized");
+        }
+
+        boardRepository.delete(board);
     }
 }
