@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.trelloclone.trello.common.exception.ResourceNotFoundException;
 import com.trelloclone.trello.membership.Membership;
 import com.trelloclone.trello.membership.MembershipRepository;
 import com.trelloclone.trello.membership.MembershipRole;
@@ -35,7 +36,7 @@ public class OrganizationService {
 
         organizationRepository.save(organization);
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         Membership membership = new Membership();
 
         membership.setOrganization(organization);
@@ -89,7 +90,7 @@ public class OrganizationService {
             throw new RuntimeException("Not authorized");
         }
         Organization org = organizationRepository.findById(organizationId)
-                .orElseThrow(() -> new RuntimeException("Organization not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Organization not found"));
 
         organizationRepository.delete(org);
     }
@@ -97,7 +98,7 @@ public class OrganizationService {
     public GetOrganizationResponse getOrganization(UUID organizationId, UUID userId) {
 
         Organization organization = organizationRepository.findById(organizationId)
-                .orElseThrow(() -> new RuntimeException("Organization not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Organization not found"));
 
         membershipRepository.findByUserIdAndOrganizationId(userId, organizationId)
                 .orElseThrow(() -> new RuntimeException("Not a member"));

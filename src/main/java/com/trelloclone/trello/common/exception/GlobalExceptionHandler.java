@@ -22,8 +22,8 @@ public class GlobalExceptionHandler {
                 .body(new ApiResponse<>("error", exception.getMessage(), null));
     }
 
-    @ExceptionHandler(BoardNotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handleBoardNotFound(BoardNotFoundException exception) {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBoardNotFound(ResourceNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiResponse<>("error", exception.getMessage(), null));
     }

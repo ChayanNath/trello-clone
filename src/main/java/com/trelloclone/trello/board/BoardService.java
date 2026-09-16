@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import com.trelloclone.trello.board.dto.BoardCreateRequest;
 import com.trelloclone.trello.board.dto.BoardUpdateRequest;
 import com.trelloclone.trello.board.dto.GetBoardResponse;
-import com.trelloclone.trello.common.exception.BoardNotFoundException;
+import com.trelloclone.trello.common.exception.ResourceNotFoundException;
 import com.trelloclone.trello.membership.Membership;
 import com.trelloclone.trello.membership.MembershipRepository;
 import com.trelloclone.trello.membership.MembershipRole;
@@ -33,7 +33,7 @@ public class BoardService {
                 .orElseThrow(() -> new RuntimeException("Not a member"));
 
         Organization organization = organizationRepository.findById(organizationId)
-                .orElseThrow(() -> new RuntimeException("Organization not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Organization not found"));
 
         Board board = new Board();
         board.setTitle(request.getTitle());
@@ -46,7 +46,7 @@ public class BoardService {
 
     public GetBoardResponse getBoard(UUID organizationId, UUID boardId, UUID userId) {
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new BoardNotFoundException("Board not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Board not found"));
 
         if (!board.getOrganization().getUuid().equals(organizationId)) {
             throw new RuntimeException("Board does not belong to organization");
@@ -59,7 +59,7 @@ public class BoardService {
 
     public GetBoardResponse updateBoard(UUID organizationId, UUID boardId, UUID userId, BoardUpdateRequest request) {
         Board board = boardRepository.findById(boardId)
-                .orElseThrow((() -> new BoardNotFoundException("Board not found")));
+                .orElseThrow((() -> new ResourceNotFoundException("Board not found")));
 
         if (!board.getOrganization().getUuid().equals(organizationId)) {
             throw new RuntimeException("Board does not belong to organization");
@@ -81,7 +81,7 @@ public class BoardService {
 
     public void deleteBoard(UUID organizationId, UUID boardId, UUID userId) {
         Board board = boardRepository.findById(boardId)
-                .orElseThrow((() -> new BoardNotFoundException("Board not found")));
+                .orElseThrow((() -> new ResourceNotFoundException("Board not found")));
 
         if (!board.getOrganization().getUuid().equals(organizationId)) {
             throw new RuntimeException("Board does not belong to organization");

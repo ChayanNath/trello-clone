@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.trelloclone.trello.common.exception.DuplicateEmailException;
 import com.trelloclone.trello.common.exception.InvalidCredentialsException;
+import com.trelloclone.trello.common.exception.ResourceNotFoundException;
 import com.trelloclone.trello.security.JwtService;
 import com.trelloclone.trello.user.User;
 import com.trelloclone.trello.user.UserRepository;
@@ -65,7 +66,7 @@ public class AuthService {
     public UserResponse getCurrentUser(UUID userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("user not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("user not found"));
 
         return new UserResponse(user.getEmail(), user.getUserName());
     }
