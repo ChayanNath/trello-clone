@@ -6,6 +6,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.trelloclone.trello.common.exception.NotAuthorizedException;
+import com.trelloclone.trello.common.exception.NotMemberException;
 import com.trelloclone.trello.common.exception.ResourceNotFoundException;
 import com.trelloclone.trello.membership.Membership;
 import com.trelloclone.trello.membership.MembershipRepository;
@@ -60,10 +62,10 @@ public class OrganizationService {
         }
 
         Membership membership = membershipRepository.findByUserIdAndOrganizationId(userId, organizationId)
-                .orElseThrow(() -> new RuntimeException("Not a member"));
+                .orElseThrow(() -> new NotMemberException("Not a member"));
 
         if (membership.getRole() != MembershipRole.ADMIN) {
-            throw new RuntimeException("Not authorized");
+            throw new NotAuthorizedException("Not authorized");
         }
 
         Organization org = organization.get();
@@ -84,7 +86,7 @@ public class OrganizationService {
     public void deleteOrganization(UUID organizationId, UUID userId) {
 
         Membership membership = membershipRepository.findByUserIdAndOrganizationId(userId, organizationId)
-                .orElseThrow(() -> new RuntimeException("Not a member"));
+                .orElseThrow(() -> new NotMemberException("Not a member"));
 
         if (membership.getRole() != MembershipRole.ADMIN) {
             throw new RuntimeException("Not authorized");
@@ -101,7 +103,7 @@ public class OrganizationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Organization not found"));
 
         membershipRepository.findByUserIdAndOrganizationId(userId, organizationId)
-                .orElseThrow(() -> new RuntimeException("Not a member"));
+                .orElseThrow(() -> new NotMemberException("Not a member"));
 
         return new GetOrganizationResponse(organization.getUuid(), organization.getName(),
                 organization.getDescription());

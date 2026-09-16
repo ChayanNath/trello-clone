@@ -27,4 +27,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiResponse<>("error", exception.getMessage(), null));
     }
+
+    @ExceptionHandler(NotMemberException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNotMember(NotMemberException exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ApiResponse<>("error", exception.getMessage(), null));
+    }
+
+    @ExceptionHandler(NotAuthorizedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNotAuthorized(NotAuthorizedException exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ApiResponse<>("error", exception.getMessage(), null));
+    }
 }
